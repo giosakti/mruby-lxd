@@ -12,13 +12,26 @@ conf.gem github: 'pathfinder-cm/mruby-lxd'
 ...
 ```
 
-Then you can run `./minirake` to start the compilation process.
+Then you can run `./minirake` to start the compilation process. The resulting binaries can be used to run mruby scripts to communicate with LXD.
 
 For more info please consult [this][mruby-doc] guide to compile mruby.
 
-## Running tests
+## Development Setup
 
-Compile mruby with these 2 gems enabled
+Ensure that you are using Ubuntu or Ubuntu-derived OS with version `16.04` or greater with LXD installed, preferrably as snap package. You can follow this steps to ensure that LXD snap is installed.
+
+> Note: This will remove existing LXD apt package and all LXCs on it.
+
+```
+sudo apt-get purge lxd* -y
+sudo apt install zfsutils-linux -y
+sudo snap install lxd --channel=3.0/stable
+sudo lxd init
+```
+
+### Running tests
+
+Compile mruby with these 2 gems enabled.
 
 ```
 ...
