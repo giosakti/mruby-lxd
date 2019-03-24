@@ -14,7 +14,7 @@ conf.gem github: 'pathfinder-cm/mruby-lxd'
 
 Then you can run `./minirake` to start the compilation process. The resulting binaries can be used to run mruby scripts to communicate with LXD.
 
-For more info please consult [this][mruby-doc] guide to compile mruby.
+For more info please consult [this][mruby-compile-guide] guide to compile mruby.
 
 ## Development Setup
 
