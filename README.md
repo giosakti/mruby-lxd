@@ -42,6 +42,8 @@ conf.gem github: 'iij/mruby-mtest'
 
 Run `mruby test/**`
 
+> Note: May need to run the command using `sudo` if the user is not in `lxd` group.
+
 ## Getting Help
 
 If you have any questions or feedback regarding mruby-lxd:
