@@ -29,6 +29,17 @@ class LxdTest < MTest::Unit::TestCase
     lxd.delete_container(hostname: 'test-01')
   end
 
+  def test_get_container_state_success
+    lxd = Lxd.new
+    lxd.create_container(
+      hostname: 'test-01',
+      container_source: shared_vars[:container_source]
+    )
+    response = lxd.get_container_state(hostname: 'test-01')
+    assert_equal(200, response.code)
+    lxd.delete_container(hostname: 'test-01')
+  end
+
   def test_get_container_address_success
     lxd = Lxd.new
     lxd.create_container(
