@@ -23,6 +23,39 @@ class Lxd
     )
   end
 
+  def get_container_address(hostname:, timeout: 60, check_interval: 2)
+    ipaddress = nil
+    found = false
+    time_limit = Time.now + timeout
+
+    while !found && (Time.now < time_limit) do
+      res = @client.request(
+        'GET',
+        "/1.0/containers/#{hostname}/state",
+        {}
+      )
+      addresses = JSON.parse(res.body).dig('metadata', 'network', 'eth0', 'addresses') || []
+      addresses.each do |address|
+        if address['family'] == 'inet'
+          ipaddress = address['address']
+        end
+      end
+
+      unless ipaddress.nil?
+        found = true
+        break
+      end
+
+      sleep(check_interval)
+    end
+
+    if found
+      return true, ipaddress
+    else
+      return false, nil
+    end
+  end
+
   def create_container(hostname:, container_source:, sync: true)
     payload = { name: hostname, source: container_source.to_h }.to_json
     res = @client.request(

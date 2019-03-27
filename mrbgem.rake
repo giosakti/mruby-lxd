@@ -7,4 +7,5 @@ MRuby::Gem::Specification.new('mruby-lxd') do |spec|
   spec.add_dependency('mruby-env')
   spec.add_dependency('mruby-iijson')
   spec.add_dependency('mruby-simplehttp')
+  spec.add_dependency('mruby-sleep', core: 'mruby-sleep')
 end
