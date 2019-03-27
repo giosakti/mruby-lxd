@@ -34,7 +34,30 @@ class Lxd
     return res
   end
 
-  def delete_container(hostname:, sync: true)
+  def start_container(hostname:, sync: true)
+    payload = { action: 'start', timeout: -1 }.to_json
+    res = @client.request(
+      'PUT',
+      "/1.0/containers/#{hostname}/state",
+      craft_request_body(payload)
+    )
+    wait_for_operation(res) if sync
+    return res
+  end
+
+  def stop_container(hostname:, force: false, sync: true)
+    payload = { action: 'stop', force: force, timeout: 60 }.to_json
+    res = @client.request(
+      'PUT',
+      "/1.0/containers/#{hostname}/state",
+      craft_request_body(payload)
+    )
+    wait_for_operation(res) if sync
+    return res
+  end
+
+  def delete_container(hostname:, force: false, sync: true)
+    stop_container(hostname: hostname, force: force, sync: sync)
     res = @client.request(
       'DELETE',
       "/1.0/containers/#{hostname}",
