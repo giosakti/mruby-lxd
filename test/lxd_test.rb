@@ -1,21 +1,64 @@
 require(File.expand_path('../mrblib/lxd', File.dirname(__FILE__)))
 
 class LxdTest < MTest::Unit::TestCase
+  def shared_vars
+    {
+      container_source: ContainerSource.new(
+        mode: 'pull', 
+        server: 'https://cloud-images.ubuntu.com/releases', 
+        protocol: 'simplestreams',
+        source_alias: '18.04'
+      )
+    }
+  end
+
   def test_get_containers_success
     lxd = Lxd.new
     response = lxd.get_containers
     assert_equal(200, response.code)
   end
 
+  def test_get_container_success
+    lxd = Lxd.new
+    lxd.create_container(
+      hostname: 'test-01',
+      container_source: shared_vars[:container_source]
+    )
+    response = lxd.get_container(hostname: 'test-01')
+    assert_equal(200, response.code)
+    lxd.delete_container(hostname: 'test-01')
+  end
+
   def test_create_container_success
     lxd = Lxd.new
-    container_source = ContainerSource.new(
-      mode: 'pull', 
-      server: 'https://cloud-images.ubuntu.com/releases', 
-      protocol: 'simplestreams',
-      source_alias: '18.04'
+    response = lxd.create_container(
+      hostname: 'test-01',
+      container_source: shared_vars[:container_source]
     )
-    response = lxd.create_container('test-01', container_source)
+    assert_equal(202, response.code)
+    lxd.delete_container(hostname: 'test-01')
+  end
+
+  def test_create_container_sync_success
+    lxd = Lxd.new
+    response = lxd.create_container(
+      hostname: 'test-01', 
+      container_source: shared_vars[:container_source], 
+      sync: true
+    )
+    get_response = lxd.get_container(hostname: 'test-01')
+    assert_equal(200, get_response.code)
+    lxd.delete_container(hostname: 'test-01')
+  end
+
+  def test_delete_container_success
+    lxd = Lxd.new
+    lxd.create_container(
+      hostname: 'test-01', 
+      container_source: shared_vars[:container_source], 
+      sync: true
+    )
+    response = lxd.delete_container(hostname: 'test-01')
     assert_equal(202, response.code)
   end
 end

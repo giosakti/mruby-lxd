@@ -15,13 +15,33 @@ class Lxd
     )
   end
 
-  def create_container(hostname, container_source)
+  def get_container(hostname:)
+    res = @client.request(
+      'GET',
+      "/1.0/containers/#{hostname}",
+      {}
+    )
+  end
+
+  def create_container(hostname:, container_source:, sync: true)
     payload = { name: hostname, source: container_source.to_h }.to_json
     res = @client.request(
       'POST',
       '/1.0/containers',
       craft_request_body(payload)
     )
+    wait_for_operation(res) if sync
+    return res
+  end
+
+  def delete_container(hostname:, sync: true)
+    res = @client.request(
+      'DELETE',
+      "/1.0/containers/#{hostname}",
+      {}
+    )
+    wait_for_operation(res) if sync
+    return res
   end
 
   private
@@ -32,5 +52,14 @@ class Lxd
       'Content-Type' => 'application/json; charset=utf-8',
       'Content-Length' => payload.length 
     }
+  end
+
+  def wait_for_operation(res)
+    op_id = JSON.parse(res.body)['metadata']['id']
+    res = @client.request(
+      'GET',
+      "/1.0/operations/#{op_id}/wait",
+      {}
+    )
   end
 end
