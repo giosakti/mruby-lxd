@@ -4,6 +4,12 @@ This repository contains LXD gem for mruby.
 
 ## Getting started
 
+Install these dependencies:
+
+- `build-essential`
+- `bison`
+- `ruby`
+
 Add this line on mruby `build_config.rb` before compilation.
 
 ```
