@@ -1,4 +1,6 @@
-require(File.expand_path('./container_source', File.dirname(__FILE__)))
+require(File.expand_path('./mruby_lxd/container_source', File.dirname(__FILE__)))
+require(File.expand_path('./mruby_lxd/container', File.dirname(__FILE__)))
+require(File.expand_path('./mruby_lxd/container_state', File.dirname(__FILE__)))
 
 class Lxd
   def initialize(opts = {})
@@ -13,6 +15,15 @@ class Lxd
       '/1.0/containers',
       {}
     )
+    if res.code == 200
+      items = JSON.parse(res.body)['metadata']
+      containers = items.map{ |m| MrubyLxd::Container.new(
+        hostname: m.split('/').last
+      )}
+      return true, containers
+    else
+      return false, nil
+    end
   end
 
   def get_container(hostname:)
@@ -21,6 +32,16 @@ class Lxd
       "/1.0/containers/#{hostname}",
       {}
     )
+    if res.code == 200
+      item = JSON.parse(res.body)['metadata']
+      container = MrubyLxd::Container.new(
+        hostname: item['name'],
+        image: item['config']['image.description']
+      )
+      return true, container
+    else
+      return false, nil
+    end
   end
 
   def get_container_state(hostname:)
@@ -29,6 +50,21 @@ class Lxd
       "/1.0/containers/#{hostname}/state",
       {}
     )
+    if res.code == 200
+      item = JSON.parse(res.body)['metadata']
+      container_state = MrubyLxd::ContainerState.new(
+        hostname: hostname,
+        status: item['status'],
+        status_code: item['status_code'],
+        disk: item['disk'],
+        memory: item['memory'],
+        network: item['network'],
+        cpu: item['cpu']
+      )
+      return true, container_state
+    else
+      return false, nil
+    end
   end
 
   def get_container_address(hostname:, timeout: 60, check_interval: 2)
@@ -37,8 +73,8 @@ class Lxd
     time_limit = Time.now + timeout
 
     while !found && (Time.now < time_limit) do
-      res = get_container_state(hostname: hostname)
-      addresses = JSON.parse(res.body).dig('metadata', 'network', 'eth0', 'addresses') || []
+      ok, container_state = get_container_state(hostname: hostname)
+      addresses = container_state.network.dig('eth0', 'addresses') || []
       addresses.each do |address|
         if address['family'] == 'inet'
           ipaddress = address['address']
@@ -67,8 +103,12 @@ class Lxd
       '/1.0/containers',
       craft_request_body(payload)
     )
-    wait_for_operation(res) if sync
-    return res
+    sync_res = wait_for_operation(res) if sync
+    if res.code == 202 || (sync && sync_res.code == 200)
+      return true
+    else
+      return false
+    end
   end
 
   def start_container(hostname:, sync: true)
@@ -78,8 +118,12 @@ class Lxd
       "/1.0/containers/#{hostname}/state",
       craft_request_body(payload)
     )
-    wait_for_operation(res) if sync
-    return res
+    sync_res = wait_for_operation(res) if sync
+    if res.code == 202 || (sync && sync_res.code == 200)
+      return true
+    else
+      return false
+    end
   end
 
   def stop_container(hostname:, force: false, sync: true)
@@ -89,8 +133,12 @@ class Lxd
       "/1.0/containers/#{hostname}/state",
       craft_request_body(payload)
     )
-    wait_for_operation(res) if sync
-    return res
+    sync_res = wait_for_operation(res) if sync
+    if res.code == 202 || (sync && sync_res.code == 200)
+      return true
+    else
+      return false
+    end
   end
 
   def delete_container(hostname:, force: false, sync: true)
@@ -100,8 +148,12 @@ class Lxd
       "/1.0/containers/#{hostname}",
       {}
     )
-    wait_for_operation(res) if sync
-    return res
+    sync_res = wait_for_operation(res) if sync
+    if res.code == 202 || (sync && sync_res.code == 200)
+      return true
+    else
+      return false
+    end
   end
 
   private

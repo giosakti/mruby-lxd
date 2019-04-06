@@ -14,8 +14,8 @@ class LxdTest < MTest::Unit::TestCase
 
   def test_get_containers_success
     lxd = Lxd.new
-    response = lxd.get_containers
-    assert_equal(200, response.code)
+    ok, _ = lxd.get_containers
+    assert_equal(true, ok)
   end
 
   def test_get_container_success
@@ -24,8 +24,8 @@ class LxdTest < MTest::Unit::TestCase
       hostname: 'test-01',
       container_source: shared_vars[:container_source]
     )
-    response = lxd.get_container(hostname: 'test-01')
-    assert_equal(200, response.code)
+    ok, _ = lxd.get_container(hostname: 'test-01')
+    assert_equal(true, ok)
     lxd.delete_container(hostname: 'test-01')
   end
 
@@ -35,8 +35,8 @@ class LxdTest < MTest::Unit::TestCase
       hostname: 'test-01',
       container_source: shared_vars[:container_source]
     )
-    response = lxd.get_container_state(hostname: 'test-01')
-    assert_equal(200, response.code)
+    ok, _ = lxd.get_container_state(hostname: 'test-01')
+    assert_equal(true, ok)
     lxd.delete_container(hostname: 'test-01')
   end
 
@@ -54,11 +54,11 @@ class LxdTest < MTest::Unit::TestCase
 
   def test_create_container_success
     lxd = Lxd.new
-    response = lxd.create_container(
+    ok = lxd.create_container(
       hostname: 'test-01',
       container_source: shared_vars[:container_source]
     )
-    assert_equal(202, response.code)
+    assert_equal(true, ok)
     lxd.delete_container(hostname: 'test-01')
   end
 
@@ -69,8 +69,8 @@ class LxdTest < MTest::Unit::TestCase
       container_source: shared_vars[:container_source], 
       sync: true
     )
-    get_response = lxd.get_container(hostname: 'test-01')
-    assert_equal(200, get_response.code)
+    ok, _ = lxd.get_container(hostname: 'test-01')
+    assert_equal(true, ok)
     lxd.delete_container(hostname: 'test-01')
   end
 
@@ -81,8 +81,8 @@ class LxdTest < MTest::Unit::TestCase
       container_source: shared_vars[:container_source], 
       sync: true
     )
-    response = lxd.start_container(hostname: 'test-01')
-    assert_equal(202, response.code)
+    ok = lxd.start_container(hostname: 'test-01')
+    assert_equal(true, ok)
     lxd.delete_container(hostname: 'test-01', force: true)
   end
 
@@ -96,8 +96,8 @@ class LxdTest < MTest::Unit::TestCase
     lxd.start_container(hostname: 'test-01')
     sleep(3)
     lxd.stop_container(hostname: 'test-01')
-    get_response = lxd.get_container(hostname: 'test-01')
-    assert_equal(102, JSON.parse(get_response.body)['metadata']['status_code'])
+    _, container_state = lxd.get_container_state(hostname: 'test-01')
+    assert_equal(102, container_state.status_code)
     lxd.delete_container(hostname: 'test-01', force: true)
   end
 
@@ -108,8 +108,8 @@ class LxdTest < MTest::Unit::TestCase
       container_source: shared_vars[:container_source], 
       sync: true
     )
-    response = lxd.delete_container(hostname: 'test-01')
-    assert_equal(202, response.code)
+    ok = lxd.delete_container(hostname: 'test-01')
+    assert_equal(true, ok)
   end
 end
 
