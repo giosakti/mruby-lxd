@@ -3,7 +3,7 @@ require(File.expand_path('../mrblib/lxd', File.dirname(__FILE__)))
 class LxdTest < MTest::Unit::TestCase
   def shared_vars
     {
-      container_source: ContainerSource.new(
+      container_source: MrubyLxd::ContainerSource.new(
         mode: 'pull', 
         server: 'https://cloud-images.ubuntu.com/releases', 
         protocol: 'simplestreams',
@@ -13,13 +13,13 @@ class LxdTest < MTest::Unit::TestCase
   end
 
   def test_get_containers_success
-    lxd = Lxd.new
+    lxd = MrubyLxd::Lxd.new
     ok, _ = lxd.get_containers
     assert_equal(true, ok)
   end
 
   def test_get_container_success
-    lxd = Lxd.new
+    lxd = MrubyLxd::Lxd.new
     lxd.create_container(
       hostname: 'test-01',
       container_source: shared_vars[:container_source]
@@ -30,7 +30,7 @@ class LxdTest < MTest::Unit::TestCase
   end
 
   def test_get_container_state_success
-    lxd = Lxd.new
+    lxd = MrubyLxd::Lxd.new
     lxd.create_container(
       hostname: 'test-01',
       container_source: shared_vars[:container_source]
@@ -41,7 +41,7 @@ class LxdTest < MTest::Unit::TestCase
   end
 
   def test_get_container_address_success
-    lxd = Lxd.new
+    lxd = MrubyLxd::Lxd.new
     lxd.create_container(
       hostname: 'test-01',
       container_source: shared_vars[:container_source]
@@ -53,7 +53,7 @@ class LxdTest < MTest::Unit::TestCase
   end
 
   def test_create_container_success
-    lxd = Lxd.new
+    lxd = MrubyLxd::Lxd.new
     ok = lxd.create_container(
       hostname: 'test-01',
       container_source: shared_vars[:container_source]
@@ -63,7 +63,7 @@ class LxdTest < MTest::Unit::TestCase
   end
 
   def test_create_container_sync_success
-    lxd = Lxd.new
+    lxd = MrubyLxd::Lxd.new
     response = lxd.create_container(
       hostname: 'test-01', 
       container_source: shared_vars[:container_source], 
@@ -75,7 +75,7 @@ class LxdTest < MTest::Unit::TestCase
   end
 
   def test_start_container_success
-    lxd = Lxd.new
+    lxd = MrubyLxd::Lxd.new
     lxd.create_container(
       hostname: 'test-01', 
       container_source: shared_vars[:container_source], 
@@ -87,7 +87,7 @@ class LxdTest < MTest::Unit::TestCase
   end
 
   def test_stop_container_success
-    lxd = Lxd.new
+    lxd = MrubyLxd::Lxd.new
     lxd.create_container(
       hostname: 'test-01', 
       container_source: shared_vars[:container_source], 
@@ -102,7 +102,7 @@ class LxdTest < MTest::Unit::TestCase
   end
 
   def test_delete_container_success
-    lxd = Lxd.new
+    lxd = MrubyLxd::Lxd.new
     lxd.create_container(
       hostname: 'test-01', 
       container_source: shared_vars[:container_source], 
