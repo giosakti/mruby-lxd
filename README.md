@@ -14,7 +14,7 @@ Add this line on mruby `build_config.rb` before compilation.
 
 ```
 ...
-conf.gem github: 'pathfinder-cm/mruby-lxd'
+conf.gem github: 'giosakti/mruby-lxd'
 ...
 ```
 
@@ -54,7 +54,7 @@ Run `mruby test/**`
 
 If you have any questions or feedback regarding mruby-lxd:
 
-- [File an issue](https://github.com/pathfinder-cm/mruby-lxd/issues/new) for bugs, issues and feature suggestions.
+- [File an issue](https://github.com/giosakti/mruby-lxd/issues/new) for bugs, issues and feature suggestions.
 
 Your feedback is always welcome.
 
